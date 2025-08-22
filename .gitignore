@@ -1,0 +1,29 @@
+# Maven target directory
+/target/
+
+# Quarkus build artifacts
+/.quarkus/
+
+# Local configuration files
+*.properties
+*.yml
+*.yaml
+
+# IDE files
+/.idea/
+/*.iml
+*.classpath
+*.project
+*.settings/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Dependency directories
+/.mvn/
+
+docs/Avaliação*
