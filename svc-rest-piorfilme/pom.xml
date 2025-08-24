@@ -35,6 +35,12 @@
             <version>1.10.0</version> <!-- Use the latest version -->
         </dependency>
 
+        <!-- Flyway specific dependencies -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-flyway</artifactId>
+        </dependency>
+
         <!-- Dependency for Hibernate ORM with Panache -->
         <dependency>
             <groupId>io.quarkus</groupId>
