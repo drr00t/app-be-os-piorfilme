@@ -4,6 +4,10 @@ package com.github.drr00t.gra.boundary.entity;
 // ponto importante aqui ja temos apenas um produtor por indicaço de filme
 // essa entidade e imutavel
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+
 public class AwardNominee {
     private final int year;
     private final String title;
