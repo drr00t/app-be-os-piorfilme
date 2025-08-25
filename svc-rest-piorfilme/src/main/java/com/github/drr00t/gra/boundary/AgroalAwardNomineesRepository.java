@@ -1,6 +1,8 @@
 package com.github.drr00t.gra.boundary;
 
+import com.github.drr00t.gra.boundary.endpoint.AwardNomineeMinAndMaxIntervalResponse;
 import com.github.drr00t.gra.boundary.endpoint.AwardNomineeResponse;
+import com.github.drr00t.gra.boundary.endpoint.AwardWinResponse;
 import com.github.drr00t.gra.boundary.entity.AwardNominee;
 import com.github.drr00t.gra.control.AwardNomineeRepository;
 import com.github.drr00t.gra.control.AwardNomineesLoaderRepository;
@@ -56,14 +58,14 @@ public class AgroalAwardNomineesRepository implements AwardNomineesLoaderReposit
     }
 
     @Override
-    public List<AwardNomineeResponse> getAwardNomineesByYear(int fromYear) {
+    public List<AwardNomineeResponse> getAwardNomineesByYear(int FROMYear) {
         String selectNomineesByYearFormat = "SELECT year, title, studios, producer, winner FROM Award_Nominees WHERE year = %d";
         try (var conn = dataSource.getConnection();
              var stmt = conn.createStatement()) {
 
-            LOGGER.info(String.format("SQL: %s", String.format(selectNomineesByYearFormat,fromYear)));
+            LOGGER.info(String.format("SQL: %s", String.format(selectNomineesByYearFormat,FROMYear)));
 
-            ResultSet result = stmt.executeQuery( String.format(selectNomineesByYearFormat,fromYear));
+            ResultSet result = stmt.executeQuery( String.format(selectNomineesByYearFormat,FROMYear));
             ArrayList<AwardNomineeResponse> nominees = new ArrayList<>();
             while(result.next())
             {
@@ -85,7 +87,47 @@ public class AgroalAwardNomineesRepository implements AwardNomineesLoaderReposit
     }
 
     @Override
-    public List<AwardNomineeResponse> getAwardNomineesWinners() {
-        return List.of();
+    public List<AwardWinResponse> getProducerWinsOrderedByInterval(boolean orderByMin) {
+
+//    mudar firstPara previeus se no houve data de referncia usa a primeira, se passar usa que for passada
+        String selectNomineesByYearFormat =
+        "SELECT "
+            + "Award_Nominees.producer,"
+            + "(SELECT count(*) FROM Award_Nominees as f_s "
+            +  "WHERE f_s.producer = Award_Nominees.producer and f_s.winner = \"yes\") as wins,"
+            + "("
+            + "(SELECT min(year) FROM Award_Nominees as f_s_nw "
+            +       "WHERE f_s_nw.producer = Award_Nominees.producer and f_s_nw.winner = \"yes\" "
+            +               "AND f_s_nw.year not in (SELECT min(year) FROM Award_Nominees as f_s_fw "
+            +                      "WHERE f_s_fw.producer = Award_Nominees.producer AND f_s_fw.winner = \"yes\")) -"
+            + "(SELECT min(year) FROM Award_Nominees as f_s_fw WHERE f_s_fw.producer = Award_Nominees.producer and f_s_fw.winner = \"yes\")) as interval,"
+            + "(SELECT min(year) FROM Award_Nominees as f_s_fw WHERE f_s_fw.producer = Award_Nominees.producer and f_s_fw.winner = \"yes\") as previousWin,"
+            + "(SELECT min(year) FROM Award_Nominees as f_s_nw WHERE f_s_nw.producer = Award_Nominees.producer and f_s_nw.winner = \"yes\" and f_s_nw.year not in (SELECT min(year) FROM Award_Nominees as f_s_fw WHERE f_s_fw.producer = Award_Nominees.producer AND f_s_fw.winner = \"yes\")) AS followingWin "
+        + "FROM Award_Nominees "
+        + "GROUP by Award_Nominees.producer HAVING interval > 0 "
+        + "ORDER by interval " + (orderByMin ? "ASC" : "DESC");
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.createStatement()) {
+
+            LOGGER.info(String.format("SQL: %s", String.format(selectNomineesByYearFormat)));
+
+            ResultSet result = stmt.executeQuery( String.format(selectNomineesByYearFormat));
+            ArrayList<AwardWinResponse> awardWins = new ArrayList<>();
+            while(result.next())
+            {
+                // read the result set
+                String producer = result.getString("producer");
+                int interval = result.getInt("interval");
+                int previousWin = result.getInt("previousWin");
+                int followingWin = result.getInt("followingWin");
+                awardWins.add(new AwardWinResponse(producer, interval, previousWin, followingWin));
+            }
+
+            return awardWins;
+
+        } catch (SQLException e) {
+            LOGGER.error("Erro ao conectar ou operar no banco de dados: ", e);
+            throw new RuntimeException("Erro ao conectar ou operar no banco de dados.", e);
+        }
     }
 }

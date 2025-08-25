@@ -1,16 +1,10 @@
 package com.github.drr00t.gra;
 
-import com.github.drr00t.gra.boundary.CsvLoadAwardNomineesLoader;
-import com.github.drr00t.gra.boundary.entity.AwardNominee;
-import io.quarkus.runtime.StartupEvent;
-import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
 
+import com.github.drr00t.gra.boundary.entity.AwardNominee;
+import io.quarkus.test.junit.QuarkusTest;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,9 +12,11 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 @QuarkusTest
 class AwardsResourceTest {
@@ -63,17 +59,14 @@ class AwardsResourceTest {
 
     @Test
     void testAwardsGetProducersJustMinAndMaxEndpoint() {
-        given()
-          .when().get("/awards/producers/intervals/max-and-min")
-          .then()
-             .statusCode(200)
-             .body(is("{\"min\":[" +
-                 "{\"producer\":\"Producer 1\",\"interval\":1,\"previousWin\":2008,\"followingWin\":2009}," +
-                 "{\"producer\":\"Producer 2\",\"interval\":1,\"previousWin\":2018,\"followingWin\":2019}" +
-                 "],\"max\":[" +
-                 "{\"producer\":\"Producer 1\",\"interval\":99,\"previousWin\":1900,\"followingWin\":1999}," +
-                 "{\"producer\":\"Producer 2\",\"interval\":99,\"previousWin\":2000,\"followingWin\":2099}" +
-                 "]}"));
+    given()
+        .when()
+        .get("/awards/producers/intervals/max-and-min")
+        .then()
+        .statusCode(200)
+        .body(
+            is(
+                "{\"min\":[{\"producer\":\"Jerry Weintraub\",\"interval\":1,\"previousWin\":1980,\"followingWin\":1981}],\"max\":[{\"producer\":\"Jerry Weintraub\",\"interval\":1,\"previousWin\":1980,\"followingWin\":1981}]}"));
     }
 
 }

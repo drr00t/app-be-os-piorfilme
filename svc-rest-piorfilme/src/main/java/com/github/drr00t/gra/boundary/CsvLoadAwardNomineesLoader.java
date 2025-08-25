@@ -63,8 +63,8 @@ public class CsvLoadAwardNomineesLoader {
     }
 
     private List<AwardNominee> processRecord(CSVRecord record) {
-        // Compile the pattern once
-        Pattern pattern = Pattern.compile(",|\\s+and\\s+");
+    // Compile the pattern once
+    Pattern pattern = Pattern.compile(",\\s+|\\s+and\\s+|and\\s+");
 
         int year = Integer.parseInt(record.get("year").trim());
         String title = record.get("title").trim();
