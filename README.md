@@ -17,12 +17,13 @@ Desenvolva uma API RESTful para possibilitar **a leitura da lista de indicados**
 
 - A arquitetura da aplicação utiliza uma versão simplificada o BCE - Boundary - Control - Entity.
 - Foi utilizado o básico de arquitetura limpa na separação de responsabilidades e pacotes:
-  - boundary: contém as implementações usando tecnologias, também possui os contratos de dados usados na interface rest
-  - control: possui apenas interfaces, optei por deixar o service **AwardWinsService** na boundary
-  - entity: a aplicação não possui camada de entity, por não haver camada de domínio com regras de negócio, paenas contrato de dados, por isso optei por criar apenas os DTOs na boundary e a camada de entity para mapeamento com as fontes de dados.
+  - **boundary:** contém as implementações usando tecnologias, também possui os contratos de dados usados na interface rest
+  - **control:** possui apenas interfaces, optei por deixar o service **AwardWinsService** na boundary
+  - **entity:** a aplicação não possui camada de entity, por não haver camada de domínio com regras de negócio, paenas contrato de dados, por isso optei por criar apenas os DTOs na boundary e a camada de entity para mapeamento com as fontes de dados.
 - Os contratos de repositório foram implementados no **AgroalAwardNomineesRepository** por simplicidade
 - Existem dois contratos de Repositórios, um para a carga do arquivo na inicialização usado no serviço **CsvLoadAwardNomineesLoader** um para consultas usado no **AwardWinsService**
 - Existe apenas um controller implementado em **AwardResource**
+- Criação da base de dados, a tabela **Awards_Nominees** é criada na inicialização através de uma migration aplicada via flyway. O arquivo de migration está na pasta **src/main/resources/db/migration** e **src/test/resources/db/migration**
 
 ### Estrutura de diretórios **svc-rest-priofilme** 
 
@@ -92,6 +93,9 @@ Algumas observações:
 - Sqlite
 - Agroal
 - apache commons-csv
+- flyway
+- junit5
+- rest-assured
 
 ### Execução dos testes integrados
 
